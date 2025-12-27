@@ -7,8 +7,8 @@ pub mod text_scanner_py {
 
     /// Formats the sum of two numbers as string.
     #[pyfunction]
-    pub fn sum_as_string(a: usize, b: usize) -> PyResult<String> {
-        Ok((a + b).to_string())
+    pub fn sum_as_str(a: usize, b: usize) -> PyResult<String> {
+        Ok(text_scanner::sum_as_string(a, b))
     }
 }
 

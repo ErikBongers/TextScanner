@@ -27,8 +27,9 @@ impl Cursor<'_> {
 }
 
 
-
-
+pub fn sum_as_string(a: usize, b: usize) -> String {
+    String::from("Rezuld iz : ")+(a + b).to_string().as_str()
+}
 
 
 #[cfg(test)]
