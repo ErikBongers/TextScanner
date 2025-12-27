@@ -2,10 +2,6 @@
 use crate::cursor::{Cursor, Range};
 mod cursor;
 
-pub fn add(left: u64, right: u64) -> u64 {
-    (left + right)*100
-}
-
 impl Cursor<'_> {
     fn find_string(&mut self, word: &str) -> bool{
         let chars2 = self.chars.clone();
