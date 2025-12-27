@@ -1,0 +1,9 @@
+[package]
+name = "text-scanner-project"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+
+[dependencies]
+text-scanner = { path = "text_scanner" }
