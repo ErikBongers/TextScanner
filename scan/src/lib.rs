@@ -21,7 +21,21 @@ impl fmt::Display for WplError {
 
 pub struct Wpl {
     pub name: String,
-    pub items: Vec<String>
+    pub items: Vec<WplItem>
+}
+
+pub enum WplItemType { Track, Stream}
+impl WplItemType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            WplItemType::Track => "Track",
+            WplItemType::Stream => "Stream"
+        }
+    }
+}
+pub struct WplItem {
+    pub path: String,
+    pub item_type: WplItemType,
 }
 
 pub fn scan_wpl(path: String) -> Result<Wpl> {
@@ -40,7 +54,7 @@ pub fn scan_wpl(path: String) -> Result<Wpl> {
         .map(|t| scanner[&t].to_string())
         .unwrap_or(title.to_string());
 
-    let mut tracks: Vec<String> = vec![];
+    let mut tracks: Vec<WplItem> = vec![];
     loop {
         if !scanner.find("<media src=\"") {
             break;
@@ -57,6 +71,7 @@ pub fn scan_wpl(path: String) -> Result<Wpl> {
       name: title.to_string(),
       items: tracks
     };
+
     Ok(wpl)
 }
 
@@ -71,9 +86,12 @@ fn replace_special_xml_chars(xml: &str) -> String {
 
 /// Returns the canonicalized path of the track.
 /// In case this fails, the original relative path is returned.
-fn normalize_path(base_path: &Path, rel_track_path_str: &str) -> String {
+fn normalize_path(base_path: &Path, rel_track_path_str: &str) -> WplItem {
     if rel_track_path_str.starts_with("http") {
-        return rel_track_path_str.to_string()
+        return WplItem {
+            path: rel_track_path_str.to_string(),
+            item_type: WplItemType::Stream
+        }
     }
     let full_track_path = base_path
         .join(replace_special_xml_chars(&rel_track_path_str));
@@ -82,11 +100,13 @@ fn normalize_path(base_path: &Path, rel_track_path_str: &str) -> String {
     let full_track_path = PathBuf::from(str_path);
     let canonicalized_path = full_track_path.canonicalize();
     match canonicalized_path {
-        Ok(path) => {
-            path.to_str().unwrap().to_string() //todo: unwrap!!!
-        }
-        Err(_) => {
-            rel_track_path_str.to_string()
+        Ok(path) => WplItem {
+            path: path.to_str().unwrap().to_string(), //todo: unwrap!!!
+            item_type: WplItemType::Track
+        },
+        Err(_) => WplItem {
+            path: rel_track_path_str.to_string(),
+            item_type: WplItemType::Track //assuming it's a track, but really, it's unknown.
         }
     }
 }
@@ -97,11 +117,11 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let res = scan_wpl(r#"Z:\Music\My Playlists\Gamba.wpl"#.to_string()).unwrap();
+        let res = scan_wpl(r#"Z:\Music\My Playlists\WebTVs.wpl"#.to_string()).unwrap();
 
         println!("name: {}", res.name);
         for line in res.items {
-            println!("{}", line);
+            println!("{}::{}", line.item_type.as_str(), line.path);
         }
     }
 }

@@ -3,16 +3,25 @@
 /// import the module.
 #[pyo3::pymodule]
 pub mod text_scanner_py {
-    use pyo3::prelude::*;
     use pyo3::exceptions::PyValueError;
+    use pyo3::prelude::*;
 
-#[pyclass]
-pub struct WplPy{
-    #[pyo3(get, set)]
-    name: String,
-    #[pyo3(get, set)]
-    items: Vec<String>
-}
+    #[pyclass( name="WplItem")]
+    #[derive(Clone)]
+    pub struct WplItemPy {
+        #[pyo3(get)]
+        path: String,
+        #[pyo3(get, name="type")]
+        item_type: String
+    }
+
+    #[pyclass( name="Wpl")]
+    pub struct WplPy{
+        #[pyo3(get)]
+        name: String,
+        #[pyo3(get)]
+        items: Vec<WplItemPy>
+    }
 
     /// Formats the sum of two numbers as string.
     #[pyfunction]
@@ -22,6 +31,10 @@ pub struct WplPy{
         Ok(WplPy {
             name: wpl.name,
             items: wpl.items
+                .into_iter()
+                .map(|i|
+                    WplItemPy{ path: i.path, item_type: i.item_type.as_str().to_string()})
+                .collect()
         })
     }
 }
