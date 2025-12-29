@@ -34,11 +34,8 @@ pub fn scan_wpl(path: String) -> Result<Vec<String>> {
         let Ok(first_line) = scanner.get_until("\"") else {
             return Err(WplError::ScanError("Could not find end of string.".to_string())) //todo get line and pos: todo: add line and pos to scanner? Yes, but calculate it on demand!
         };
-        let rel_track_path = scanner[&first_line].to_string();
-        let abs_track_path = base_path.join(rel_track_path);
 
-        let path_str = replace_special_xml_chars(&abs_track_path.as_path().to_str().unwrap());
-        let path_str = normalize_path(base_path, &path_str);
+        let path_str = normalize_path(base_path, &scanner[&first_line]);
         tracks.push(path_str);
     }
     Ok(tracks)
@@ -56,7 +53,11 @@ fn replace_special_xml_chars(xml: &str) -> String {
 /// Returns the canonicalized path of the track.
 /// In case this fails, the original relative path is returned.
 fn normalize_path(base_path: &Path, rel_track_path_str: &str) -> String {
-    let full_track_path = base_path.join(rel_track_path_str);
+    if rel_track_path_str.starts_with("http") {
+        return rel_track_path_str.to_string()
+    }
+    let full_track_path = base_path
+        .join(replace_special_xml_chars(&rel_track_path_str));
     let str_path = full_track_path.to_str().unwrap().to_string();
     let str_path = str_path.replace("\\", "/");
     let full_track_path = PathBuf::from(str_path);
@@ -77,7 +78,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let res = scan_wpl(r#"Z:\Music\My Playlists\Religioso.wpl"#.to_string());
+        let res = scan_wpl(r#"Z:\Music\My Playlists\Gamba.wpl"#.to_string());
 
         for line in res.unwrap() {
             println!("{}", line);
