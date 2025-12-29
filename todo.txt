@@ -20,3 +20,8 @@ python3 -m venv .env
 source .env/bin/activate
 pip install maturin
 maturin develop
+> when fails, try:
+cargo update
+> this will re-load the text-scanner-rs dep.
+> Make sure the dep in scan/Cargo.toml points to git.
+cp target/maturin/libtext_scanner_py.so __destination_folder__/text_scanner_py.so

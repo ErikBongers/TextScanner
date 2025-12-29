@@ -162,7 +162,7 @@ checksum = "b1dd07eb858a2067e2f3c7155d54e929265c264e6f37efe3ee7a8d1b5a1dd0ba"
 [[package]]
 name = "text-scanner"
 version = "0.1.1"
-source = "git+https://github.com/ErikBongers/text_scanner_rs.git?tag=v0.1.1#4de36a49185d678c006e2de1383149de753100df"
+source = "git+https://github.com/ErikBongers/text_scanner_rs.git?tag=v0.1.1#6931cb9ddb72278187b0cbb4c2a471de66238989"
 
 [[package]]
 name = "text-scanner-project"
