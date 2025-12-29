@@ -19,13 +19,27 @@ impl fmt::Display for WplError {
     }
 }
 
-pub fn scan_wpl(path: String) -> Result<Vec<String>> {
+pub struct Wpl {
+    pub name: String,
+    pub items: Vec<String>
+}
+
+pub fn scan_wpl(path: String) -> Result<Wpl> {
     let file_path = std::path::Path::new(&path);
     let base_path = file_path.parent().unwrap();//todo: unwrap!!
     let text = fs::read_to_string(&path).map_err( |err| {
             return WplError::FileError(err.to_string());
         })?;
     let mut scanner = TextScanner::new(&text);
+
+    let title = file_path.file_prefix()
+        .map(|f| f.to_str().unwrap_or(""))
+        .unwrap_or("");
+    scanner.find("<title>");
+    let title = scanner.get_until("</title>")
+        .map(|t| scanner[&t].to_string())
+        .unwrap_or(title.to_string());
+
     let mut tracks: Vec<String> = vec![];
     loop {
         if !scanner.find("<media src=\"") {
@@ -38,7 +52,12 @@ pub fn scan_wpl(path: String) -> Result<Vec<String>> {
         let path_str = normalize_path(base_path, &scanner[&first_line]);
         tracks.push(path_str);
     }
-    Ok(tracks)
+
+    let wpl = Wpl {
+      name: title.to_string(),
+      items: tracks
+    };
+    Ok(wpl)
 }
 
 fn replace_special_xml_chars(xml: &str) -> String {
@@ -78,9 +97,10 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let res = scan_wpl(r#"Z:\Music\My Playlists\Gamba.wpl"#.to_string());
+        let res = scan_wpl(r#"Z:\Music\My Playlists\Gamba.wpl"#.to_string()).unwrap();
 
-        for line in res.unwrap() {
+        println!("name: {}", res.name);
+        for line in res.items {
             println!("{}", line);
         }
     }
