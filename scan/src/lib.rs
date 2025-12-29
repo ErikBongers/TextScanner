@@ -53,12 +53,22 @@ fn replace_special_xml_chars(xml: &str) -> String {
         .replace("&apos;", "'")
 }
 
+/// Returns the canonicalized path of the track.
+/// In case this fails, the original relative path is returned.
 fn normalize_path(base_path: &Path, rel_track_path_str: &str) -> String {
     let full_track_path = base_path.join(rel_track_path_str);
     let str_path = full_track_path.to_str().unwrap().to_string();
     let str_path = str_path.replace("\\", "/");
     let full_track_path = PathBuf::from(str_path);
-    full_track_path.canonicalize().unwrap().to_str().unwrap().to_string() //todo: unwrap!!!
+    let canonicalized_path = full_track_path.canonicalize();
+    match canonicalized_path {
+        Ok(path) => {
+            path.to_str().unwrap().to_string() //todo: unwrap!!!
+        }
+        Err(_) => {
+            rel_track_path_str.to_string()
+        }
+    }
 }
 
 #[cfg(test)]
