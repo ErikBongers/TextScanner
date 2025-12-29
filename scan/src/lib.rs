@@ -1,4 +1,5 @@
 use std::{fmt, fs};
+use std::path::{Path, PathBuf};
 use text_scanner::TextScanner;
 
 pub type Result<T> = std::result::Result<T, WplError>;
@@ -19,6 +20,8 @@ impl fmt::Display for WplError {
 }
 
 pub fn scan_wpl(path: String) -> Result<Vec<String>> {
+    let file_path = std::path::Path::new(&path);
+    let base_path = file_path.parent().unwrap();//todo: unwrap!!
     let text = fs::read_to_string(&path).map_err( |err| {
             return WplError::FileError(err.to_string());
         })?;
@@ -31,8 +34,12 @@ pub fn scan_wpl(path: String) -> Result<Vec<String>> {
         let Ok(first_line) = scanner.get_until("\" ") else {
             return Err(WplError::ScanError("Could not find end of string.".to_string())) //todo get line and pos: todo: add line and pos to scanner? Yes, but calculate it on demand!
         };
-        let line = scanner[&first_line].to_string();
-        tracks.push(replace_special_xml_chars(&line));
+        let rel_track_path = scanner[&first_line].to_string();
+        let abs_track_path = base_path.join(rel_track_path);
+
+        let path_str = replace_special_xml_chars(&abs_track_path.as_path().to_str().unwrap());
+        let path_str = normalize_path(base_path, &path_str);
+        tracks.push(path_str);
     }
     Ok(tracks)
 }
@@ -46,6 +53,14 @@ fn replace_special_xml_chars(xml: &str) -> String {
         .replace("&apos;", "'")
 }
 
+fn normalize_path(base_path: &Path, rel_track_path_str: &str) -> String {
+    let full_track_path = base_path.join(rel_track_path_str);
+    let str_path = full_track_path.to_str().unwrap().to_string();
+    let str_path = str_path.replace("\\", "/");
+    let full_track_path = PathBuf::from(str_path);
+    full_track_path.canonicalize().unwrap().to_str().unwrap().to_string() //todo: unwrap!!!
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -55,7 +70,7 @@ mod tests {
         let res = scan_wpl(r#"Z:\Music\My Playlists\Religioso.wpl"#.to_string());
 
         for line in res.unwrap() {
-            println!("{:?}", line);
+            println!("{}", line);
         }
     }
 }
