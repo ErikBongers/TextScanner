@@ -31,7 +31,7 @@ pub fn scan_wpl(path: String) -> Result<Vec<String>> {
         if !scanner.find("<media src=\"") {
             break;
         }
-        let Ok(first_line) = scanner.get_until("\" ") else {
+        let Ok(first_line) = scanner.get_until("\"") else {
             return Err(WplError::ScanError("Could not find end of string.".to_string())) //todo get line and pos: todo: add line and pos to scanner? Yes, but calculate it on demand!
         };
         let rel_track_path = scanner[&first_line].to_string();
