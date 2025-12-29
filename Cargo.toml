@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [workspace]
-members = ["text_scanner_py"]
+members = ["scan","text_scanner_py"]
 
 [dependencies]

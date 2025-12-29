@@ -4,11 +4,13 @@
 #[pyo3::pymodule]
 pub mod text_scanner_py {
     use pyo3::prelude::*;
+    use pyo3::exceptions::PyValueError;
 
     /// Formats the sum of two numbers as string.
     #[pyfunction]
-    pub fn sum_as_str(a: usize, b: usize) -> PyResult<String> {
-        Ok(text_scanner::sum_as_string(a, b))
+    pub fn scan_wpl(path: String) -> PyResult<Vec<String>> {
+        let tracks = scan::scan_wpl(path)
+            .map_err(|err| PyValueError::new_err(err.to_string()))?;
+        Ok(tracks)
     }
 }
-

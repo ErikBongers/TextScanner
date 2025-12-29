@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="EMPTY_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Python" name="Python facet">
+      <configuration sdkName="Python 3.12 (TextScanner)" />
+    </facet>
+  </component>
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/text_scanner/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/text_scanner_py/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/scan/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/text_scanner_py" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/test_scanner/target" />
       <excludeFolder url="file://$MODULE_DIR$/text_scanner/target" />
+      <excludeFolder url="file://$MODULE_DIR$/text_scanner_py/.env" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Python 3.12 (TextScanner) interpreter library" level="application" />
   </component>
 </module>
